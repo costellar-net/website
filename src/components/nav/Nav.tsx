@@ -1,64 +1,98 @@
 'use client';
 
-import { InfoContext } from '@/providers/Info';
-import { useViewportSize, useWindowScroll } from '@mantine/hooks';
-import React, { useContext, useState } from 'react';
-import Banner from './Banner';
+import React, { useContext, useEffect, useState } from 'react';
 import Image from 'next/image';
-import Links from './Links/Links';
-import Hamburger from './Hamburger/Hamburger';
+import Hamburger from './Hamburger';
 import Link from 'next/link';
-import { AnimatePresence, m } from 'framer-motion';
+import { info } from '@/lib/info';
+import { CostellarContext } from '@/providers/Costellar';
+import Anchor from '../ui/Anchor';
+import Tooltip from '../ui/Tooltip';
+import { TbMenu2, TbX } from 'react-icons/tb';
+import { useHotkeys } from '@mantine/hooks';
 import clsx from 'clsx';
 
 const Nav: React.FC = () => {
-	const [scroll] = useWindowScroll();
-	const { width } = useViewportSize();
-	const { info } = useContext(InfoContext);
+	const [open, setOpen] = useState<boolean>(false);
+	const { setScrollLocked } = useContext(CostellarContext);
 
-	const [hamburgerOpen, setHamburgerOpen] = useState(false);
-	const [bannerOpen, setBannerOpen] = useState(true);
+	useEffect(() => setScrollLocked(open), [open]);
+	useHotkeys([['escape', () => setOpen(false)]]);
 
 	return (
 		<>
-			<AnimatePresence>{hamburgerOpen && <Hamburger setOpen={setHamburgerOpen} />}</AnimatePresence>
-			<div className='fixed z-30 top-0 left-0 w-full max-w-[100vw]'>
-				<div className='flex justify-between items-center px-[5vw] sm:px-[20vw] py-1 transition-all bg-[var(--bg-normal)]'>
+			<nav className='fixed z-30 top-0 left-0 w-screen max-w-[100vw]'>
+				<Hamburger open={open} setOpen={setOpen} />
+				<div
+					className={clsx(
+						'flex justify-between items-center mx-[5vw] xl:mx-[20vw] px-5 py-3 transition-all  rounded-3xl relative',
+						!open && 'hover:bg-black/30 hover:backdrop-blur-sm'
+					)}>
 					<Link
 						href='/'
 						title='Home'
-						className='flex items-center gap-3 hover:bg-[var(--border-low)] focus-visible:bg-[var(--border-low)] px-2 rounded-xl transition-colors'>
-						<Image src={info.logo_src} alt='' width={50} height={50} />
-						<p className='sm:text-xl font-bold text-[var(--text-low)]'>{info.name}</p>
+						className='flex items-center gap-2 focusable rounded-xl m-1 hover:scale-105 transition-transform'>
+						<Image
+							src={info.logo_src}
+							alt=''
+							width={30}
+							height={30}
+							className='transition-all w-auto rounded-xl size-[30px]'
+						/>
+						<p className='font-black font-title text-transparent bg-gradient-to-tr from-[#d0ae7d] to-[#111] dark:to-[#fefefe] bg-clip-text text-xl'>
+							<span className='opacity-0'>Costellar</span>
+							<span className='absolute top-0 left-0 flex text-transparent bg-gradient-to-r from-[#d0ae7d] to-[#111] dark:to-[#fefefe] bg-clip-text'>
+								<svg className='absolute' style={{ width: 0, height: 0 }}>
+									<filter id='blackhole-distortion'>
+										<feTurbulence type='fractalNoise' baseFrequency='0.02' numOctaves='2' result='noise'>
+											<animate
+												attributeName='baseFrequency'
+												dur='10s'
+												values='0.02;0.06;0.02'
+												repeatCount='indefinite'
+											/>
+										</feTurbulence>
+										<feDisplacementMap
+											in='SourceGraphic'
+											in2='noise'
+											scale='30'
+											xChannelSelector='R'
+											yChannelSelector='G'
+										/>
+									</filter>
+								</svg>
+								<span
+									className='absolute top-0 left-0 text-black dark:text-white text-xl font-bold font-title select-none'
+									style={{
+										filter: 'url(#blackhole-distortion)',
+										WebkitMaskImage: 'linear-gradient(to left, #0005 30%, #0000 100%)',
+										maskImage: 'linear-gradient(to left, #0005 30%, #0000 100%)',
+									}}>
+									Costellar
+								</span>
+								Costellar
+							</span>
+						</p>
 					</Link>
-					{info.banner && !bannerOpen && width > 500 && (
-						<m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className='w-1/2 center'>
-							<Link
-								href={info.banner.url}
-								title={info.banner.text}
-								className='flex items-center justify-center text-center lg:text-xl font-bold uppercase rounded-xl bg-[var(--accent)] px-5 py-2 h-5/6 w-1/2'>
-								{info.banner.text}
-							</Link>
-						</m.div>
-					)}
-					{width > 1000 ? (
-						<Links />
-					) : (
-						<button className='icon' onClick={() => setHamburgerOpen(true)} title='Menu'>
-							<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960' className='size-6'>
-								<path d='M149-191q-26 0-44.5-18.5T86-254q0-26 18.5-44.5T149-317h662q26 0 44.5 18.5T874-254q0 26-18.5 44.5T811-191H149Zm0-226q-26 0-44.5-18.5T86-480q0-26 18.5-44.5T149-543h662q26 0 44.5 18.5T874-480q0 26-18.5 44.5T811-417H149Zm0-226q-26 0-44.5-18.5T86-706q0-26 18.5-44.5T149-769h662q26 0 44.5 18.5T874-706q0 26-18.5 44.5T811-643H149Z' />
-							</svg>
-						</button>
-					)}
+
+					<div className='flex gap-3'>
+						<Anchor href='/quote' variant='Filled' className='max-sm:hidden'>
+							Free Quote
+						</Anchor>
+						<Tooltip label={open ? 'Close Menu' : 'Open Menu'} delay={0}>
+							<button
+								className={clsx(
+									'rounded-xl hover:bg-highlight-200 p-2 transition-colors cursor-pointer',
+									open ? 'text-light-600' : 'text-dark-500 dark:text-light-600'
+								)}
+								onClick={() => setOpen((prev) => !prev)}
+								title='Menu'>
+								{open ? <TbX /> : <TbMenu2 />}
+							</button>
+						</Tooltip>
+					</div>
 				</div>
-				<AnimatePresence>
-					{bannerOpen && (
-						<m.div exit={{ opacity: 0, y: -50, scale: 0.75 }}>
-							<Banner setOpen={setBannerOpen} />
-						</m.div>
-					)}
-				</AnimatePresence>
-			</div>
+			</nav>
 		</>
 	);
 };

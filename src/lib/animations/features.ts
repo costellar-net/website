@@ -1,2 +1,2 @@
-import { domAnimation } from 'framer-motion';
+import { domAnimation } from 'motion/react';
 export default domAnimation;

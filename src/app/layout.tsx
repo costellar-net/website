@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
-import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
-import { PT_Sans } from 'next/font/google';
-import '@/styles/globals.css';
+import { IconProvider } from '@/providers/Icons';
+import { CostellarProvider } from '@/providers/Costellar';
+import { font_accent, font_body, font_title } from '@/lib/fonts';
 import Animations from '@/lib/animations/lazy';
-import { InfoProvider } from '@/providers/Info';
+import { UserdataProvider } from '@/providers/Userdata';
+import { LightboxProvider } from '@/providers/Lightbox';
+import clsx from 'clsx';
+import '@/styles/globals.css';
 
 export const metadata: Metadata = {
 	title: 'Costellar: Exceptional Web Solutions for Your Digital Success',
@@ -29,13 +32,6 @@ export const metadata: Metadata = {
 	],
 };
 
-const font = PT_Sans({
-	subsets: ['latin'],
-	display: 'swap',
-	weight: ['400', '700'],
-	fallback: ['sans-serif'],
-});
-
 const schema = {
 	'@context': 'http://schema.org',
 	'@type': 'Organization',
@@ -60,14 +56,16 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
-			<body className={font.className}>
-				<InfoProvider>
-					<Animations>{children}</Animations>
-				</InfoProvider>
-				<script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
-			</body>
-			<GoogleAnalytics gaId='G-K4S7R15KTF' />
-			<GoogleTagManager gtmId='GTM-PKNRCX57' />
+			<IconProvider>
+				<CostellarProvider font={clsx(font_body.variable, font_title.variable, font_accent.variable, font_body.className)}>
+					<Animations>
+						<LightboxProvider>
+							<UserdataProvider>{children}</UserdataProvider>
+						</LightboxProvider>
+					</Animations>
+					<script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+				</CostellarProvider>
+			</IconProvider>
 		</html>
 	);
 }

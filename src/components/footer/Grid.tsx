@@ -1,10 +1,8 @@
-import { InfoContext } from '@/providers/Info';
+import { info } from '@/lib/info';
 import Link from 'next/link';
-import React, { useContext } from 'react';
+import React from 'react';
 
 const Grid: React.FC = () => {
-	const { info } = useContext(InfoContext);
-
 	return (
 		<div className='grid w-1/2 gap-10 grid-rows-1 grid-flow-col'>
 			{info.sitemap.map((group, i) => {
