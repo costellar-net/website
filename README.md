@@ -22,26 +22,12 @@ NOTICE: ALTHOUGH ALL CODE IN THIS PROJECT IS OPEN SOURCE, ATTEMPTS TO IMPERSONAT
 
 ## Todo
 
-Page Specific
-
+-  add some way to see what design the user wants
 -  /launchpad get working
 -  /login get working
--  /quote add base pricing
--  /quote fix mobile slider
--  /quote spec slide py on mobile
--  /quote add management link to last slide
 -  /quote add api call
 -  /api redo api and update it
--  /(legal)/\* make the scroll to padding more for mobile
--  /(legal)/\* back to top button
--  / add pricing to bottom
 -  /components/nav fix mobile tooltip, its permanent and also starts left when should start right (gets cut off by edge of screen)
-
----
-
-General
-
--  fix "Get a Free Quote" capitalization to all be equal
 
 ---
 
@@ -51,3 +37,6 @@ Low Priority
 -  correct image sizes and optimize quality for their size post
 -  add loading skeletons to what needs it, e.g. /components/ui/carousel
 -  add more backgrounds and nicer viusals for things like /quote
+-  /(legal)/\* make the scroll to padding more for mobile
+-  /(legal)/\* back to top button
+-  add multilang support

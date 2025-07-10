@@ -95,11 +95,7 @@ export default function Page() {
 					</div>
 				</div>
 				<div className='flex flex-col items-center mx-2'>
-					<div
-						className={clsx(
-							'p-10 bg-light-900 dark:bg-dark-500 rounded-3xl border-2 transition-colors',
-							error ? 'border-red-800/90 dark:border-red-400/90' : 'border-transparent'
-						)}>
+					<div className='p-10 bg-light-900 dark:bg-dark-500 rounded-3xl'>
 						<h1 className='text-2xl font-title font-bold'>Login to Launchpad</h1>
 						<h2 className='text-dark-900/60 dark:text-highlight-900 mt-1 leading-tight'>
 							View and manage your website from one simple dashboard.
@@ -125,7 +121,7 @@ export default function Page() {
 							)}
 						</div>
 					</div>
-					<p className='text-highlight-500 mt-2 max-w-96 leading-tight text-xs text-center'>
+					<p className='text-highlight-900 mt-2 max-w-96 leading-tight text-xs text-center'>
 						Account login details are given to you when you purchase a website. Please contact us if you have issues logging
 						in.
 					</p>

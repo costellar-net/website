@@ -33,7 +33,7 @@ const Page: React.FC = () => {
 					These are some of the projects we have worked on. If you would like your own, reach out!
 				</p>
 				<Anchor href='/quote' variant='Filled' className='mt-3'>
-					Get a free Quote
+					Get a Free Quote
 				</Anchor>
 			</div>
 			<div className='w-full bg-gradient-to-b pt-2 sm:pt-7 from-light-800 dark:from-dark-600'>

@@ -6,6 +6,7 @@ import { m } from 'motion/react';
 import { features } from '@/lib/features';
 import Link from 'next/link';
 import { TbArrowRight, TbCircleCheckFilled } from 'react-icons/tb';
+import { formatCurrency } from '@/lib/lang/curreny';
 
 export default function Home() {
 	return (
@@ -57,13 +58,13 @@ export default function Home() {
 
 			<div className='px-1 py-20 w-full center bg-gradient-to-b from-light-800 dark:from-dark-600'>
 				<div className='flex flex-col gap-10 items-center'>
-					<h3 className='text-5xl font-bold text-center'>What&apos;s the price?</h3>
+					<h3 className='text-5xl font-bold text-center'>Starting at only {formatCurrency(1500)}</h3>
 					<Link
 						className='button'
 						aria-label='Form'
 						href='/quote'
 						style={{ '--color': 'var(--accent-opacity)' } as React.CSSProperties}>
-						Talk Today
+						Get a Free Quote
 					</Link>
 				</div>
 			</div>

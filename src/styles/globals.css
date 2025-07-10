@@ -15,7 +15,7 @@
 	--font-accent: var(--font-accent), system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
 
 	--color-link: #24a3f2;
-	--color-focus: #539bf555;
+	--color-focus: #539bf5;
 	--color-accent: #d0ae7d;
 	--color-accent-dark: #bd9d71;
 
@@ -238,7 +238,7 @@
 
 /* .link */
 .link {
-	@apply cursor-pointer inline-flex gap-1 items-center text-link rounded-[1px];
+	@apply cursor-pointer inline-flex gap-1.5 items-center text-link rounded-[1px];
 }
 
 .link svg {

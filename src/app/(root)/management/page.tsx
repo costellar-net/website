@@ -86,7 +86,7 @@ const Page: React.FC = () => {
 					<div className='flex flex-col gap-5'>
 						<p className='text-center text-3xl font-title font-bold'>If you&apos;re interested</p>
 						<Anchor href='/quote' variant='Filled'>
-							Get a free Quote
+							Get a Free Quote
 						</Anchor>
 					</div>
 					<div className='flex flex-col'>

@@ -17,13 +17,24 @@ import Checkbox from '@/components/ui/Checkbox';
 import Slider from '@/components/ui/Slider';
 import Accordion from '@/components/ui/Accordion';
 import { info } from '@/lib/info';
+import { formatCurrency } from '@/lib/lang/curreny';
 
 const future = [
 	{
 		icon: <p className='text-sm size-5 bg-link text-light-900 font-title font-bold rounded-full center select-none'>1</p>,
 		name: 'Purchase & Ownership',
-		description:
-			'You will receive the complete source code for your website once we are done and you are satisfied with the website. Once delivered, the code and website are fully yours.',
+		description: (
+			<div className='space-y-2 leading-tight'>
+				<p>
+					You will receive the complete source code for your website once we are done and you are satisfied with the website.
+					Once delivered, the code and website are fully yours.
+				</p>
+				<p>
+					We will charge you half of the base price before we start working on the website and the last half when we are
+					complete with the website. You will receive invoices via email.
+				</p>
+			</div>
+		),
 	},
 	{
 		icon: <p className='text-sm size-5 bg-link text-light-900 font-title font-bold rounded-full center select-none'>2</p>,
@@ -53,10 +64,13 @@ const future = [
 		name: 'Ongoing Management (Optional)',
 		description: (
 			<>
-				<p className='font-semibold'>As the code is now completely yours, you may:</p>
+				<p className='font-semibold'>To keep the site updated, and since the code is now completely yours, you may:</p>
 				<ul className='list-decimal list-inside ml-5 mt-1 space-y-1'>
 					<li>
-						Purchase a management plan from us <span className='text-green-600 dark:text-green-300'>(Recommended)</span>
+						<Anchor href='/management' openInNew>
+							Purchase a management plan from us
+						</Anchor>{' '}
+						<span className='text-green-600 dark:text-green-300'>(Recommended)</span>
 					</li>
 					<li>
 						Work with another developer of your choice, such as:
@@ -76,24 +90,40 @@ const future = [
 	},
 ];
 
-const sizes = ['Single Page App', '1-3 Pages', '1-10 Pages', 'Dynamic Page App'];
+interface Size {
+	size: string;
+	cost: number;
+}
 
-const specifications = [
-	{ name: 'Emailing', price: '$20/m' },
-	{ name: 'Contact Form', price: '$0/m' },
-	{ name: 'Newsletter Signup', price: '$20/m' },
-	{ name: 'Blogs', price: 'Pay as you go' },
-	{ name: 'Forums', price: 'Pay as you go' },
-	{ name: 'Instant Messaging', price: 'Pay as you go' },
-	{ name: 'Account/Auth System', price: 'Pay as you go' },
-	{ name: 'Admin Dashboard', price: '$0/m' },
-	{ name: 'Analytics', price: '$0/m' },
-	{ name: 'Database', price: 'Pay as you go' },
-	{ name: 'E-commerce', price: '$0/m' },
-	{ name: 'Payment Integration', price: '$0/m' },
-	// { name: 'Multilingual Support', price: '' },
-	// { name: 'Booking System', price: '' },
-	// { name: 'Push Notifications', price: '' },
+const sizes = [
+	{ cost: 1500, size: '1 Page' },
+	{ cost: 2000, size: '1-5 Pages' },
+	{ cost: 2500, size: '1-10 Pages' },
+	{ cost: 5000, size: 'Dynamic Page App' },
+];
+
+interface Specification {
+	name: string;
+	base: number;
+	monthly: number | 'Pay as you go';
+}
+
+const specifications: Specification[] = [
+	{ name: 'Emailing', base: 100, monthly: 20 },
+	{ name: 'Contact Form', base: 50, monthly: 0 },
+	{ name: 'Newsletter Signup', base: 100, monthly: 20 },
+	{ name: 'Blogs', base: 100, monthly: 'Pay as you go' },
+	{ name: 'Forums', base: 200, monthly: 'Pay as you go' },
+	// { name: 'Instant Messaging', base: 500, monthly: 'Pay as you go' },
+	{ name: 'Account/Auth System', base: 250, monthly: 'Pay as you go' },
+	{ name: 'Admin Dashboard', base: 500, monthly: 0 },
+	// { name: 'Analytics', base: 250, monthly: 0 },
+	{ name: 'Database', base: 100, monthly: 'Pay as you go' },
+	// { name: 'E-commerce', base: 250, monthly: 0 },
+	// { name: 'Payment Integration', base: 100, monthly: 0 },
+	// { name: 'Multilingual Support', base: 100, monthly: 0 },
+	// { name: 'Booking System', base: 250, monthly: 20 },
+	// { name: 'Push Notifications', base: 100, monthly: 0 },
 ];
 
 const schema = z.object({
@@ -111,12 +141,22 @@ const schema = z.object({
 });
 
 type Schema = z.infer<typeof schema>;
+type Price = {
+	base: number;
+	monthly: number;
+};
+
+export type FormSchema = Schema & Price;
 
 const Page: React.FC = () => {
 	const [form, setForm] = useState<'Questions' | 'Loading' | 'Error' | 'Success'>('Questions');
 	const [step, setStep] = useState(0);
-	const [selectedSpecs, setSelectedSpecs] = useState<{ name: string; price: string }[]>([]);
-	const [selectedSize, setSelectedSize] = useState<string>(sizes[0]);
+	const [price, setPrice] = useState<Price>({
+		base: 1500,
+		monthly: 0,
+	});
+	const [selectedSpecs, setSelectedSpecs] = useState<Specification[]>([]);
+	const [selectedSize, setSelectedSize] = useState<Size>(sizes[0]);
 
 	const {
 		register,
@@ -129,37 +169,40 @@ const Page: React.FC = () => {
 		resolver: zodResolver(schema),
 		defaultValues: {
 			website: '',
-			size: 'Single Page App',
+			size: sizes[0].size,
 		},
 	});
 
 	const websiteValue = watch('website');
 
 	const onSubmit = async (formData: Schema) => {
+		if (step < slides.length - 1) {
+			return;
+		}
+
 		formData.specifications = selectedSpecs.map((spec) => spec.name);
-		formData.size = selectedSize;
+		formData.size = selectedSize.size;
 
 		try {
 			setForm('Loading');
 
-			console.log(formData);
-			console.log(JSON.stringify(formData));
+			console.log(JSON.stringify({ ...formData, ...price }));
 
-			// const response = await fetch('/api/message', {
-			// 	method: 'POST',
-			// 	headers: {
-			// 		'Content-Type': 'application/json',
-			// 	},
-			// 	body: JSON.stringify(formData),
-			// });
+			const response = await fetch('/api/quoting', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ ...formData, ...price }),
+			});
 
-			// const data = await response.json();
+			const data = await response.json();
 
-			// if (data.status === 'Error') {
-			// 	console.error(data);
-			// 	setForm('Error');
-			// 	return;
-			// }
+			if (data.result !== 200) {
+				console.error(data);
+				setForm('Error');
+				return;
+			}
 
 			setForm('Success');
 		} catch (error) {
@@ -198,48 +241,58 @@ const Page: React.FC = () => {
 	const prevStep = () => setStep((s) => s - 1);
 
 	const slides = [
-		<m.div initial={{ opacity: 0, y: -50, scale: 0.75 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }}>
-			<div>
-				<h1 className='text-3xl font-title font-bold'>Let&apos;s talk</h1>
-				<p className='text-dark-900/60 dark:text-highlight-900 mt-1 mb-5'>How should we contact you</p>
-			</div>
-			<div>
-				<label htmlFor='name' className='text-xl mb-1 block'>
-					Your Name <span className='text-red-500'>*</span>
-				</label>
-				<input id='name' {...register('name')} className='input' placeholder='John Doe' />
-				<AnimatePresence>
-					{errors.name && (
-						<m.p
-							initial={{ opacity: 0, height: 0 }}
-							animate={{ opacity: 1, height: 'auto' }}
-							exit={{ opacity: 0, height: 0 }}
-							className='text-red-700 dark:text-red-400 text-sm mt-1'>
-							{errors.name.message}
-						</m.p>
-					)}
-				</AnimatePresence>
-			</div>
-			<div className='mt-3'>
-				<label htmlFor='email' className='text-xl mb-1 block'>
-					Your Email <span className='text-red-500'>*</span>
-				</label>
-				<input id='email' {...register('email')} className='input' placeholder='example@example.com' />
-				<AnimatePresence>
-					{errors.email && (
-						<m.p
-							initial={{ opacity: 0, height: 0 }}
-							animate={{ opacity: 1, height: 'auto' }}
-							exit={{ opacity: 0, height: 0 }}
-							className='text-red-700 dark:text-red-400 text-sm mt-1'>
-							{errors.email.message}
-						</m.p>
-					)}
-				</AnimatePresence>
+		<m.div
+			initial={{ opacity: 0, y: -50, scale: 0.75 }}
+			whileInView={{ opacity: 1, y: 0, scale: 1 }}
+			exit={{ opacity: 0 }}
+			className='center'>
+			<div className='w-[90%] md:w-2/3 xl:w-1/2'>
+				<div>
+					<h1 className='text-3xl font-title font-bold'>Let&apos;s talk</h1>
+					<p className='text-dark-900/60 dark:text-highlight-900 mt-1 mb-5'>How should we contact you</p>
+				</div>
+				<div>
+					<label htmlFor='name' className='text-xl mb-1 block'>
+						Your Name <span className='text-red-500'>*</span>
+					</label>
+					<input id='name' {...register('name')} className='input' placeholder='John Doe' />
+					<AnimatePresence>
+						{errors.name && (
+							<m.p
+								initial={{ opacity: 0, height: 0 }}
+								animate={{ opacity: 1, height: 'auto' }}
+								exit={{ opacity: 0, height: 0 }}
+								className='text-red-700 dark:text-red-400 text-sm mt-1'>
+								{errors.name.message}
+							</m.p>
+						)}
+					</AnimatePresence>
+				</div>
+				<div className='mt-3'>
+					<label htmlFor='email' className='text-xl mb-1 block'>
+						Your Email <span className='text-red-500'>*</span>
+					</label>
+					<input id='email' {...register('email')} className='input' placeholder='example@example.com' />
+					<AnimatePresence>
+						{errors.email && (
+							<m.p
+								initial={{ opacity: 0, height: 0 }}
+								animate={{ opacity: 1, height: 'auto' }}
+								exit={{ opacity: 0, height: 0 }}
+								className='text-red-700 dark:text-red-400 text-sm mt-1'>
+								{errors.email.message}
+							</m.p>
+						)}
+					</AnimatePresence>
+				</div>
 			</div>
 		</m.div>,
-		<div>
-			<m.div initial={{ opacity: 0, y: -50, scale: 0.75 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }}>
+		<div className='center'>
+			<m.div
+				initial={{ opacity: 0, y: -50, scale: 0.75 }}
+				whileInView={{ opacity: 1, y: 0, scale: 1 }}
+				exit={{ opacity: 0 }}
+				className='w-[90%] md:w-2/3 xl:w-1/2'>
 				<p className='text-3xl font-title font-bold mb-5'>New design or redesign?</p>
 				<label htmlFor='website' className='text-xl block'>
 					Your Current Website
@@ -261,51 +314,90 @@ const Page: React.FC = () => {
 				</AnimatePresence>
 			</m.div>
 		</div>,
-		<m.div initial={{ opacity: 0, y: -50, scale: 0.75 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }}>
-			<p className='text-3xl font-title font-bold'>Out of the Box</p>
-			<p className='text-dark-900/60 dark:text-highlight-900 mt-1'>
-				These are the features and perks you automatically will get.
-			</p>
-			<div className='mt-3 sm:mt-6 flex flex-col min-h-[45vh]'>
-				<Accordion items={features} />
-				<Anchor openInNew href='/features' className='mt-3 text-sm'>
-					Read More
-				</Anchor>
+		<m.div
+			initial={{ opacity: 0, y: -50, scale: 0.75 }}
+			whileInView={{ opacity: 1, y: 0, scale: 1 }}
+			exit={{ opacity: 0 }}
+			className='center py-16'>
+			<div className='w-[90%] md:w-2/3 xl:w-1/2'>
+				<p className='text-3xl font-title font-bold'>Out of the Box</p>
+				<p className='text-dark-900/60 dark:text-highlight-900 mt-1'>
+					These are the features and perks you automatically will get.
+				</p>
+				<div className='mt-3 sm:mt-6 flex flex-col min-h-[45vh]'>
+					<Accordion items={features} />
+					<Anchor openInNew href='/features' className='mt-3 text-sm'>
+						Read More
+					</Anchor>
+				</div>
 			</div>
 		</m.div>,
-		<div>
-			<m.div initial={{ opacity: 0, y: -50, scale: 0.75 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }}>
+		<div className='center'>
+			<m.div
+				className='w-[90%] md:w-2/3 xl:w-1/2'
+				initial={{ opacity: 0, y: -50, scale: 0.75 }}
+				whileInView={{ opacity: 1, y: 0, scale: 1 }}
+				exit={{ opacity: 0 }}>
 				<p className='text-3xl font-title font-bold'>Website Size</p>
 				<p className='text-dark-900/60 dark:text-highlight-900 mt-1 leading-tight'>
 					Make a rough guess of how many pages your website will have. Don&apos;t worry, you can change this later.
 				</p>
-				<Slider sizes={sizes} value={selectedSize} onChange={setSelectedSize} />
+				<Slider
+					className='mr-8 max-sm:w-[75vw]'
+					values={sizes.map((s) => s.size)}
+					value={selectedSize.size}
+					onChange={(size) => {
+						const found = sizes.find((s) => s.size === size);
+
+						if (found) {
+							setSelectedSize(found);
+
+							setPrice({ ...price, base: found.cost });
+						}
+					}}
+				/>
 			</m.div>
 		</div>,
-		<m.div initial={{ opacity: 0, y: -50, scale: 0.75 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }}>
-			<p className='text-3xl font-title font-bold'>Specifications</p>
-			<p className='text-dark-900/60 dark:text-highlight-900 mt-1 leading-tight'>
-				Make a rough guess of what features your website will have. Don&apos;t worry, you can change this later. If you would
-				like to have other features, please specify them on the next slide.
-			</p>
-			<div className='flex flex-col gap-1 mt-5'>
-				{specifications.map((spec) => (
-					<div
-						key={spec.name}
-						className='flex justify-between items-center gap-2 text-lg leading-[1.05] border-b-2 border-transparent group hover:border-lowlight-200 hover:dark:border-highlight-100 transition-colors'>
-						<label className='flex gap-2 items-center cursor-pointer'>
-							<Checkbox
-								checkBoxClassName='!size-4'
-								checked={selectedSpecs.includes(spec)}
-								onChange={() => {
-									setSelectedSpecs((prev) => (prev.includes(spec) ? prev.filter((s) => s !== spec) : [...prev, spec]));
-								}}
-							/>
-							<span>{spec.name}</span>
-						</label>
-						<p className='text-dark-900/60 dark:text-highlight-900 '>{spec.price}</p>
+		<m.div
+			initial={{ opacity: 0, y: -50, scale: 0.75 }}
+			whileInView={{ opacity: 1, y: 0, scale: 1 }}
+			exit={{ opacity: 0 }}
+			className='center'>
+			<div className='w-[90%] md:w-2/3 xl:w-1/2 my-10'>
+				<p className='text-3xl font-title font-bold'>Specifications</p>
+				<p className='text-dark-900/60 dark:text-highlight-900 mt-1 leading-tight'>
+					Make a rough guess of what features your website will have. Don&apos;t worry, you can change this later. If you
+					would like to have other features, please specify them on the next slide.
+				</p>
+				<div className='flex flex-col mt-5 sm:bg-lowlight-100 sm:dark:bg-dark-400 rounded-2xl sm:p-5'>
+					<div className='flex justify-between items-center gap-2 text-lg leading-[1.05] sm:px-2 py-1 max-sm:text-sm'>
+						<p className='w-2/4'>Specification</p>
+						<p className='w-1/4'>Base Cost</p>
+						<p className='w-1/4'>Monthly Cost*</p>
 					</div>
-				))}
+					{specifications.map((spec) => (
+						<label
+							key={spec.name}
+							className='flex justify-between items-center gap-2 text-lg leading-[1.05] hover:bg-lowlight-100 hover:dark:bg-highlight-100 rounded-lg sm:px-2 py-1 cursor-pointer max-sm:text-sm'>
+							<div className='flex gap-2 items-center w-2/4'>
+								<Checkbox
+									checkBoxClassName='!size-4'
+									checked={selectedSpecs.includes(spec)}
+									onChange={() => {
+										setSelectedSpecs((prev) =>
+											prev.includes(spec) ? prev.filter((s) => s !== spec) : [...prev, spec]
+										);
+									}}
+								/>
+								<span>{spec.name}</span>
+							</div>
+							<p className='text-dark-900/60 dark:text-highlight-900 w-1/4'>{formatCurrency(spec.base)}</p>
+							<p className='text-dark-900/60 dark:text-highlight-900 w-1/4'>
+								{spec.monthly === 'Pay as you go' ? spec.monthly : formatCurrency(spec.monthly) + '/m'}
+							</p>
+						</label>
+					))}
+				</div>
 				{selectedSpecs.length > 0 ? (
 					<button
 						type='button'
@@ -323,15 +415,19 @@ const Page: React.FC = () => {
 						Select All
 					</button>
 				)}
-				<p className='text-sm text-dark-900/60 dark:text-highlight-900'>
-					<br /> *Estimates are only the upkeep cost, there are base charges for each that depend on your needs.
-					<br />
-					*If you&apos;re confused about estimates, please refer to the last slide.
+				<p className='text-xs sm:text-sm text-dark-900/60 dark:text-highlight-900 mt-3'>
+					*Monthly costs are estimates and depend on what service you select, the current estimates are from companies or
+					services that what we recommend or have used in the past. If you&apos;re confused about why you can select a
+					service, please refer to the last slide.
 				</p>
 			</div>
 		</m.div>,
-		<div>
-			<m.div initial={{ opacity: 0, y: -50, scale: 0.75 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }}>
+		<div className='center'>
+			<m.div
+				initial={{ opacity: 0, y: -50, scale: 0.75 }}
+				whileInView={{ opacity: 1, y: 0, scale: 1 }}
+				exit={{ opacity: 0 }}
+				className='w-[90%] md:w-2/3 xl:w-1/2'>
 				<p className='text-3xl font-title font-bold'>Message</p>
 				<p className='text-dark-900/60 dark:text-highlight-900 mt-1 mb-3 leading-tight'>
 					Are there any other things you&apos;d like to mention, ask, or provide? (Don&apos;t worry, you can always email us
@@ -357,15 +453,21 @@ const Page: React.FC = () => {
 				</AnimatePresence>
 			</m.div>
 		</div>,
-		<m.div initial={{ opacity: 0, y: -50, scale: 0.75 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }}>
-			<p className='text-3xl font-title font-bold'>Purchase Process</p>
-			<p className='text-dark-900/60 dark:text-highlight-900 mt-1 mb-3 leading-tight'>
-				We heavily recommend reading through all of these steps.
-			</p>
-			<Accordion items={future} />
-			<p className='mt-5 text-dark-900/70 dark:text-highlight-900 leading-tight'>
-				We believe in transparency and flexibility. You are never locked in and have full control over your website.
-			</p>
+		<m.div
+			initial={{ opacity: 0, y: -50, scale: 0.75 }}
+			whileInView={{ opacity: 1, y: 0, scale: 1 }}
+			exit={{ opacity: 0 }}
+			className='center py-16'>
+			<div className='w-[90%] md:w-2/3 xl:w-1/2'>
+				<p className='text-3xl font-title font-bold'>Purchase Process</p>
+				<p className='text-dark-900/60 dark:text-highlight-900 mt-1 mb-3 leading-tight'>
+					We heavily recommend reading through all of these steps.
+				</p>
+				<Accordion items={future} />
+				<p className='mt-5 text-dark-900/70 dark:text-highlight-900 leading-tight'>
+					We believe in transparency and flexibility. You are never locked in and have full control over your website.
+				</p>
+			</div>
 		</m.div>,
 	];
 
@@ -374,7 +476,7 @@ const Page: React.FC = () => {
 			{form !== 'Success' ? (
 				<MotionConfig transition={{ duration: 0.2, type: 'spring', bounce: 0 }}>
 					<div className='py-5 center overflow-hidden'>
-						<form onSubmit={handleSubmit(onSubmit)} className='w-[90%] md:w-1/2 xl:w-1/3 flex flex-col' noValidate>
+						<form onSubmit={handleSubmit(onSubmit)} className='w-full flex flex-col' noValidate>
 							<div className='min-h-[75vh] center'>
 								<div className='w-full'>
 									<MotionConfig transition={{ duration: 0.4, type: 'spring', bounce: 0 }}>
@@ -382,7 +484,18 @@ const Page: React.FC = () => {
 									</MotionConfig>
 								</div>
 							</div>
-							<div className='mt-5 center'>
+
+							{/* Progress Bar */}
+							<div className='w-full h-1 bg-light-700 dark:bg-dark-400 overflow-hidden'>
+								<div
+									className='h-full bg-accent transition-all duration-300'
+									style={{
+										width: `${(step / (fieldsPerStep.length - 1)) * 100}%`,
+									}}
+								/>
+							</div>
+
+							<div className='pt-10 center bg-gradient-to-b from-light-700 dark:from-dark-400'>
 								<div className='flex flex-col gap-2'>
 									<div className='flex gap-3'>
 										<Button type='button' onClick={prevStep} disabled={step <= 0}>
@@ -424,15 +537,34 @@ const Page: React.FC = () => {
 										)}
 									</div>
 
-									{/* Progress Bar */}
-									<div className='w-full h-1 bg-dark-100 rounded-full overflow-hidden'>
-										<div
-											className='h-full bg-accent transition-all duration-300'
-											style={{
-												width: `${(step / (fieldsPerStep.length - 1)) * 100}%`,
-											}}
-										/>
-									</div>
+									{step > 2 && (
+										<m.div
+											initial={{ opacity: 0, height: 0 }}
+											animate={{ opacity: 1, height: 'auto' }}
+											exit={{ opacity: 0, height: 0 }}
+											className='mt-1 leading-tight'>
+											<p className='font-title font-bold'>Estimated Costs</p>
+											<p>
+												Base:{' ~'}
+												{formatCurrency(
+													selectedSize.cost +
+														selectedSpecs.reduce(
+															(sum, spec) => sum + (typeof spec.base === 'number' ? spec.base : 0),
+															0
+														)
+												)}
+											</p>
+											<p>
+												Monthly: ~{selectedSpecs.some((spec) => spec.monthly === 'Pay as you go') && 'At least '}
+												{formatCurrency(
+													selectedSpecs.reduce(
+														(sum, spec) => (typeof spec.monthly === 'number' ? sum + spec.monthly : sum),
+														0
+													)
+												)}
+											</p>
+										</m.div>
+									)}
 
 									<AnimatePresence>
 										{form === 'Error' && (
@@ -453,10 +585,7 @@ const Page: React.FC = () => {
 			) : (
 				<MotionConfig transition={{ duration: 1, type: 'spring', bounce: 0 }}>
 					<div className='center w-full min-h-[75vh] bg-gradient-to-b from-[#111112] from-60% to-dark-500 px-5 overflow-hidden'>
-						<m.div
-							initial={{ opacity: 0 }}
-							whileInView={{ opacity: 1 }}
-							className='absolute w-full lg:w-1/2 lg:left-1/4 2xl:w-1/3 left-0 top-10'>
+						<m.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className='top-0 sm:size-1/2 absolute -z-0'>
 							<div className='size-[101%] bg-radial-gradient absolute z-10'></div>
 							<video preload='none' playsInline autoPlay muted loop className='object-cover size-full'>
 								<source src='/blackhole.webm' type='video/webm' />

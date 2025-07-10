@@ -49,7 +49,7 @@ const Hero: React.FC = () => {
 				</p>
 				<div className='flex gap-5 mt-5'>
 					<Anchor href='/quote' variant='Filled'>
-						Get a free Quote
+						Get a Free Quote
 					</Anchor>
 					<Anchor href='/portfolio' className='text-lg'>
 						See Portfolio

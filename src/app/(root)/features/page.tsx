@@ -36,7 +36,7 @@ const Page: React.FC = () => {
 					aria-label='Form'
 					href='/quoting'
 					style={{ '--color': 'var(--accent-opacity)' } as React.CSSProperties}>
-					Get a free Quote
+					Get a Free Quote
 				</Link>
 			</div>
 			<p className='text-sm mt-20 text-center px-5'>

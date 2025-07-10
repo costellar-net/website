@@ -20,8 +20,10 @@ const Accordion: React.FC<P> = ({ items }) => {
 	return items.map((item, i) => {
 		return (
 			<div
-				className='flex gap-2 flex-col w-full pt-3 cursor-pointer overflow-hidden'
-				onClick={() => setShown((prev) => (prev === item.name ? undefined : item.name))}
+				className='flex gap-2 flex-col w-full pt-3 cursor-pointer overflow-hidden focus-visible:outline-0 group'
+				tabIndex={0}
+				// onClick={() => setShown((prev) => (prev === item.name ? undefined : item.name))}
+				onFocus={() => setShown((prev) => (prev === item.name ? undefined : item.name))}
 				key={i}>
 				<div className={clsx('flex items-center justify-between group', shown && shown !== item.name && 'opacity-50')}>
 					<div className='flex gap-2 items-center'>
@@ -42,7 +44,7 @@ const Accordion: React.FC<P> = ({ items }) => {
 						</m.div>
 					)}
 				</AnimatePresence>
-				<hr className='hr mt-1' />
+				<hr className='hr group-focus-visible:bg-focus mt-1' />
 			</div>
 		);
 	});

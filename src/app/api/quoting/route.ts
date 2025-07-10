@@ -1,17 +1,14 @@
+import { FormSchema } from '@/app/(root)/quote/page';
 import { NextRequest } from 'next/server';
 
-interface Form {
-	name: string;
-	email: string;
-	phone: string | undefined;
-	website: string | undefined;
-	use_phone: boolean;
-}
-
 export async function POST(req: NextRequest) {
-	const { name, email, phone, website, use_phone }: Form = await req.json();
+	const { name, email, website, message, size, specifications, base, monthly }: FormSchema = await req.json();
 
-	console.log({ name, email, phone, website, use_phone });
+	console.log({ name, email, message, website, size, specifications, base, monthly });
+
+	return new Response(JSON.stringify({ result: 200 }), {
+		status: 200,
+	});
 
 	const requestBody = {
 		parent: { database_id: process.env.CRM_DATABASE_ID },
