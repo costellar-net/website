@@ -1,19 +1,5 @@
-'use client';
-
 export function formatCurrency(amount: number): string {
-	if (!navigator) {
-		console.error('Navigator null');
-		return amount.toString();
-	}
-
-	const isMobile = typeof navigator !== 'undefined' && navigator.userAgent.includes('Mobile');
-
-	if (!isMobile) {
-		console.error('Navigator is not mobile');
-		return amount.toString();
-	}
-
-	const locale: string = navigator.language || 'en-US';
+	const locale: string = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US';
 
 	const currencyMap: Record<string, string> = {
 		'en-US': 'USD',
