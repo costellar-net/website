@@ -332,9 +332,6 @@ const Page: React.FC = () => {
 				</p>
 				<div className='mt-3 sm:mt-6 flex flex-col min-h-[45vh]'>
 					<Accordion items={features} />
-					<Anchor openInNew href='/features' className='mt-3 text-sm'>
-						Read More
-					</Anchor>
 				</div>
 			</div>
 		</m.div>,
@@ -471,7 +468,12 @@ const Page: React.FC = () => {
 				</p>
 				<Accordion items={future} />
 				<p className='mt-5 text-dark-900/70 dark:text-highlight-900 leading-tight'>
-					We believe in transparency and flexibility. You are never locked in and have full control over your website.
+					We believe in transparency and flexibility. You are never locked in and have full control over your website. Still
+					have questions?{' '}
+					<Anchor openInNew href='/features'>
+						Read our FAQ here
+					</Anchor>
+					.
 				</p>
 			</div>
 		</m.div>,

@@ -1,5 +1,6 @@
 'use client';
 
+import Email from '@/components/Email';
 import Anchor from '@/components/ui/Anchor';
 import { info } from '@/lib/info';
 import { AnimatePresence, m } from 'motion/react';
@@ -7,27 +8,31 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { HiChevronDown } from 'react-icons/hi';
 
-const included = [
+const faq = [
 	{
-		title: 'Bug Fixes',
-		description: 'We promptly resolve any bugs or technical issues that arise on your website to ensure smooth operation.',
-	},
-	{
-		title: 'Basic Content Addition',
-		description: 'Add or update simple content such as text, images, or links to keep your site fresh and relevant.',
-	},
-	{
-		title: 'Request of Advanced Content (paid extra)',
+		title: 'Does Costellar provide a fair price?',
 		description:
-			'Request more complex features or content, such as new pages or custom functionality, for an additional fee. Note: we are usually very generous when it comes to this being paid extra.',
+			"We believe we do, because you will recieve something hand-coded and completely custom. By this we mean that it isn't just another wix or wordpress site. We are always transparent, send you the entire code, and genuinly try to get you the best website possible.",
 	},
 	{
-		title: 'Check-ins',
-		description: 'When needed, we reviews your website to ensure everything is running optimally.',
+		title: 'Do I need the management plan from Costellar?',
+		description:
+			"No, since we send you the code and transfer the services that power the website, you have full freedom to do whatever you like. Of course, if you don't know how to code you will have a couple options like AI, hiring a SWE/Freelancer, learning code, etc. This service aims at more tech oriented people that what the heavy lifting done for them.",
 	},
 	{
-		title: 'SEO Updates',
-		description: "Ongoing improvements to your site's search engine optimization to help you stay visible online.",
+		title: 'Are check-ins scheduled?',
+		description:
+			'No, we believe there\'s no big benefit of this since we code websites for long term reliability. You can always shoot us a message/email and we are happy to help. This serves more as a "patch new vulnerability" or "fix outage". ',
+	},
+	{
+		title: 'How much is the management plan?',
+		description:
+			'It depends on how active/how many features you request. There is usually a base and we charge you per advanced feature but you can expect at least a $100 per month cost.',
+	},
+	{
+		title: 'Does Costellar guarantee certain numbers/targets?',
+		description:
+			'No, obviously we aim for the best website we can but your how well your business, service, and advertisement is, all compose the actual traction to the website. We purely provide the website: not advertisements, not social media marketing, no other services.',
 	},
 ];
 
@@ -37,32 +42,22 @@ const Page: React.FC = () => {
 	return (
 		<div className='w-full center flex-col'>
 			<div className='w-[90%] center py-20 flex flex-col'>
-				<p className='text-xl text-center'>What&apos;s included in</p>
-				<h1 className='text-center text-4xl font-bold'>Site Management</h1>
+				<h1 className='text-center text-4xl font-bold'>Frequently Asked Questions</h1>
+				<p className='text-xl text-center'>
+					Please let us know if you have any other questions at <Email />
+				</p>
 			</div>
 
 			<div className='w-[90%] md:w-1/2 flex flex-col flex-wrap gap-3 min-h-[45vh]'>
-				<div className='flex flex-col'>
-					<h2 className='text-3xl font-bold'>It&apos;s our plan to keep you up to date.</h2>
-					<p className='leading-tight text-dark-900/60 dark:text-highlight-900 md:text-lg'>
-						So we&apos;ve made a plan just for you. Every month you pay for this plan, we will make sure your site gets:
-					</p>
-				</div>
-
-				{included.map((item, i) => {
+				{faq.map((item, i) => {
 					return (
 						<div
 							className='flex flex-col gap-3 bg-lowlight-100 hover:bg-lowlight-200 dark:bg-highlight-100 hover:dark:bg-highlight-200 p-5 rounded-xl cursor-pointer transition-colors'
 							key={i}
 							onClick={() => setShown((prev) => (prev === item.description ? undefined : item.description))}>
-							<div className='flex gap-3 items-center justify-between'>
-								<div className='flex gap-1 items-center'>
-									<HiChevronDown />
-									<p className='text-2xl'>{item.title}</p>
-								</div>
-								<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960' className='size-8 fill-green-600'>
-									<path d='m421-443-60-60q-17-17-42-17t-42 17q-17 17-16.5 42t17.5 42l98 98q19.36 19 45.18 19T466-321l211-211q17-17 17-41.5T677-615q-17-17-42-17t-42 17L421-443Zm59 397q-91 0-169.99-34.08-78.98-34.09-137.41-92.52-58.43-58.43-92.52-137.41Q46-389 46-480q0-91 34.08-169.99 34.09-78.98 92.52-137.41 58.43-58.43 137.41-92.52Q389-914 480-914q91 0 169.99 34.08 78.98 34.09 137.41 92.52 58.43 58.43 92.52 137.41Q914-571 914-480q0 91-34.08 169.99-34.09 78.98-92.52 137.41-58.43 58.43-137.41 92.52Q571-46 480-46Z' />
-								</svg>
+							<div className='flex gap-1 items-center'>
+								<HiChevronDown />
+								<p className='text-xl'>{item.title}</p>
 							</div>
 
 							<AnimatePresence>
@@ -72,7 +67,7 @@ const Page: React.FC = () => {
 										animate={{ opacity: 1, height: 'auto' }}
 										exit={{ opacity: 0, height: 0, marginTop: -12 }}
 										transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
-										className='leading-[1.15]'>
+										className='text-lg'>
 										{item.description}
 									</m.p>
 								)}
