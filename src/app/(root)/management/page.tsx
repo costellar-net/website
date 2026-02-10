@@ -22,7 +22,7 @@ const included = [
 	},
 	{
 		title: 'Check-ins',
-		description: 'Regularly scheduled reviews of your website to ensure everything is running optimally.',
+		description: 'When needed, we reviews your website to ensure everything is running optimally.',
 	},
 	{
 		title: 'SEO Updates',
@@ -81,7 +81,7 @@ const Page: React.FC = () => {
 				})}
 			</div>
 
-			<div className='w-full py-10 center bg-gradient-to-b from-light-800 dark:from-dark-600 mt-10 md:mt-20'>
+			<div className='w-full py-10 center bg-linear-to-b from-light-800 dark:from-dark-600 mt-10 md:mt-20'>
 				<div className='w-full md:w-1/2 flex justify-center max-sm:flex-col gap-15 px-5'>
 					<div className='flex flex-col gap-5'>
 						<p className='text-center text-3xl font-title font-bold'>If you&apos;re interested</p>

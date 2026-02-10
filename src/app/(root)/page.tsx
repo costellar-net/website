@@ -56,11 +56,12 @@ export default function Home() {
 						src='/galaxy.mp4'
 					/> */}
 
-			<div className='px-1 py-20 w-full center bg-gradient-to-b from-light-800 dark:from-dark-600'>
-				<div className='flex flex-col gap-10 items-center'>
+			<div className='px-1 py-20 w-full center bg-linear-to-b from-light-800 dark:from-dark-600'>
+				<div className='flex flex-col gap-3 items-center'>
 					<h3 className='text-5xl font-bold text-center'>Starting at only {formatCurrency(1500)}</h3>
+					<p>For a hand-coded completely custom website (No Wix, No Wordpress, No Full-AI website)</p>
 					<Link
-						className='button'
+						className='button mt-8'
 						aria-label='Form'
 						href='/quote'
 						style={{ '--color': 'var(--accent-opacity)' } as React.CSSProperties}>

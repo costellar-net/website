@@ -17,9 +17,9 @@ const Hero: React.FC = () => {
 				</video>
 			</div>
 			<div className='flex flex-col gap-2 absolute md:left-[20%] max-md:top-[45%] z-20 px-5'>
-				<h1 className='text-5xl font-title font-black md:min-w-[1000px]'>
+				<h1 className='text-5xl font-title font-black md:min-w-250'>
 					<span className='opacity-0'>Modern. Fast. Awesome</span>
-					<m.span className='absolute top-0 left-0 flex text-transparent bg-gradient-to-r from-[#d0ae7d] to-[#fefefe] bg-clip-text'>
+					<m.span className='absolute top-0 left-0 flex text-transparent bg-linear-to-r from-accent to-[#fefefe] bg-clip-text'>
 						<svg className='absolute' style={{ width: 0, height: 0 }}>
 							<filter id='blackhole-distortion'>
 								{/* feTurbulence creates a noise pattern; animate its baseFrequency for dynamic effect */}

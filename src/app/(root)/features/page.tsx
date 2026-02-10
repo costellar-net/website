@@ -34,7 +34,7 @@ const Page: React.FC = () => {
 				<Link
 					className='button mt-10'
 					aria-label='Form'
-					href='/quoting'
+					href='/quote'
 					style={{ '--color': 'var(--accent-opacity)' } as React.CSSProperties}>
 					Get a Free Quote
 				</Link>

@@ -2,11 +2,11 @@ import Footer from '@/components/footer/Footer';
 import Nav from '@/components/nav/Nav';
 import React from 'react';
 
-interface P {
-	children: React.ReactElement;
-}
+type RootLayoutProps = {
+	children: React.ReactNode;
+};
 
-const layout: React.FC<P> = ({ children }) => {
+const RootLayout = ({ children }: RootLayoutProps) => {
 	return (
 		<>
 			<Nav />
@@ -16,4 +16,4 @@ const layout: React.FC<P> = ({ children }) => {
 	);
 };
 
-export default layout;
+export default RootLayout;

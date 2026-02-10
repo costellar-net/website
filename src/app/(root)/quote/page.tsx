@@ -18,6 +18,7 @@ import Slider from '@/components/ui/Slider';
 import Accordion from '@/components/ui/Accordion';
 import { info } from '@/lib/info';
 import { formatCurrency } from '@/lib/lang/curreny';
+import Galaxy from './Galaxy';
 
 const future = [
 	{
@@ -67,10 +68,8 @@ const future = [
 				<p className='font-semibold'>To keep the site updated, and since the code is now completely yours, you may:</p>
 				<ul className='list-decimal list-inside ml-5 mt-1 space-y-1'>
 					<li>
-						<Anchor href='/management' openInNew>
-							Purchase a management plan from us
-						</Anchor>{' '}
-						<span className='text-green-600 dark:text-green-300'>(Recommended)</span>
+						Purchase a management plan from us
+						<span className='text-green-600 dark:text-green-300'> (Recommended)</span>
 					</li>
 					<li>
 						Work with another developer of your choice, such as:
@@ -175,6 +174,14 @@ const Page: React.FC = () => {
 
 	const websiteValue = watch('website');
 
+	const calculateQuote = () => {
+		const base =
+			selectedSize.cost + selectedSpecs.reduce((sum, spec) => sum + (typeof spec.base === 'number' ? spec.base : 0), 0);
+		const monthly = selectedSpecs.reduce((sum, spec) => (typeof spec.monthly === 'number' ? sum + spec.monthly : sum), 0);
+
+		return { base, monthly };
+	};
+
 	const onSubmit = async (formData: Schema) => {
 		if (step < slides.length - 1) {
 			return;
@@ -182,18 +189,17 @@ const Page: React.FC = () => {
 
 		formData.specifications = selectedSpecs.map((spec) => spec.name);
 		formData.size = selectedSize.size;
+		const quote = calculateQuote();
 
 		try {
 			setForm('Loading');
-
-			console.log(JSON.stringify({ ...formData, ...price }));
 
 			const response = await fetch('/api/quoting', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ ...formData, ...price }),
+				body: JSON.stringify({ ...formData, ...quote }),
 			});
 
 			const data = await response.json();
@@ -385,7 +391,7 @@ const Page: React.FC = () => {
 									checked={selectedSpecs.includes(spec)}
 									onChange={() => {
 										setSelectedSpecs((prev) =>
-											prev.includes(spec) ? prev.filter((s) => s !== spec) : [...prev, spec]
+											prev.includes(spec) ? prev.filter((s) => s !== spec) : [...prev, spec],
 										);
 									}}
 								/>
@@ -495,7 +501,7 @@ const Page: React.FC = () => {
 								/>
 							</div>
 
-							<div className='pt-10 center bg-gradient-to-b from-light-700 dark:from-dark-400'>
+							<div className='pt-10 center bg-linear-to-b from-light-700 dark:from-dark-400'>
 								<div className='flex flex-col gap-2'>
 									<div className='flex gap-3'>
 										<Button type='button' onClick={prevStep} disabled={step <= 0}>
@@ -550,8 +556,8 @@ const Page: React.FC = () => {
 													selectedSize.cost +
 														selectedSpecs.reduce(
 															(sum, spec) => sum + (typeof spec.base === 'number' ? spec.base : 0),
-															0
-														)
+															0,
+														),
 												)}
 											</p>
 											<p>
@@ -559,8 +565,8 @@ const Page: React.FC = () => {
 												{formatCurrency(
 													selectedSpecs.reduce(
 														(sum, spec) => (typeof spec.monthly === 'number' ? sum + spec.monthly : sum),
-														0
-													)
+														0,
+													),
 												)}
 											</p>
 										</m.div>
@@ -584,13 +590,29 @@ const Page: React.FC = () => {
 				</MotionConfig>
 			) : (
 				<MotionConfig transition={{ duration: 1, type: 'spring', bounce: 0 }}>
-					<div className='center w-full min-h-[75vh] bg-gradient-to-b from-[#111112] from-60% to-dark-500 px-5 overflow-hidden'>
-						<m.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className='top-0 sm:size-1/2 absolute -z-0'>
+					<div className='center w-full min-h-[75vh] bg-linear-to-b from-[#111112] from-60% to-dark-800 px-5 overflow-hidden'>
+						{/* <m.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className='top-0 sm:size-1/2 absolute -z-0'>
 							<div className='size-[101%] bg-radial-gradient absolute z-10'></div>
 							<video preload='none' playsInline autoPlay muted loop className='object-cover size-full'>
 								<source src='/blackhole.webm' type='video/webm' />
 							</video>
-						</m.div>
+						</m.div> */}
+						<div className='absolute h-screen w-screen'>
+							<Galaxy
+								mouseRepulsion
+								mouseInteraction
+								density={1}
+								glowIntensity={0.3}
+								saturation={0}
+								hueShift={140}
+								twinkleIntensity={0.3}
+								rotationSpeed={0.1}
+								repulsionStrength={2}
+								autoCenterRepulsion={0}
+								starSpeed={0.5}
+								speed={1}
+							/>
+						</div>
 						<m.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} className='text-center z-10'>
 							<p className='text-3xl font-bold font-title text-white/90'>Thank you!</p>
 							<p className='leading-tight mt-1 text-white/75'>
